@@ -38,17 +38,17 @@ namespace vfindex
     namespace ccsplayer
     {
         // 55 8B EC 51 56 8B F1 80 BE ? ? ? ? ? 74 36
-        add_idx ( update_client_side_animations, 221 );
-        add_idx ( is_player, 155 );
+        add_idx ( update_client_side_animations, 222 );
+        add_idx ( is_player, 156 );
     }
 
     namespace ccscombat_weapon
     {
         add_idx ( is_weapon, 163 );
-        add_idx ( get_cs_weapon_data, 454 );
-        add_idx ( get_inaccuracy, 476 );
-        add_idx ( get_spread, 446 );
-        add_idx ( update_accuracy_penalty, 477 );
+        add_idx ( get_cs_weapon_data, 455 );
+        add_idx ( get_inaccuracy, 477 );
+        add_idx ( get_spread, 447 );
+        add_idx ( update_accuracy_penalty, 478 );
     }
 
     namespace cattributable_item

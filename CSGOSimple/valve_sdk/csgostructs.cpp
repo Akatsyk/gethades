@@ -4,9 +4,9 @@
 
 bool C_BaseEntity::is_player ( )
 {
-    //index: 152
+    //index: 156
     //ref: "effects/nightvision"
-    //sig: 8B 92 ? ? ? ? FF D2 84 C0 0F 45 F7 85 F6
+    //Sig: E8 ? ? ? ? 84 C0 74 7E
     return CallVFunction< bool ( __thiscall*) ( C_BaseEntity* ) > ( this, vfindex::ccsplayer::is_player ) ( this );
 }
 
