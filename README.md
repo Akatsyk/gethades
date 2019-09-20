@@ -1,4 +1,4 @@
-# gethades-fixed-maybe-idk
+# gethades-fixed
 
-fixed all building errors.
-dont inject manual map.
+Fixed all building errors.
+Don't inject manual map.
