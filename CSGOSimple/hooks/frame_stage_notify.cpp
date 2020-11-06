@@ -26,7 +26,7 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
 
     if ( g_options.visuals_nosmoke_mode != 0 )
     {
-        static uint32_t smoke_count = * reinterpret_cast< uint32_t* > ( g_utils.pattern_scan ( xor_str ( "client_panorama.dll" ),
+        static uint32_t smoke_count = * reinterpret_cast< uint32_t* > ( g_utils.pattern_scan ( xor_str ( "client.dll" ),
                                                                                                xor_str ( "A3 ? ? ? ? 57 8B CB" ) ) + 0x1 );
         * reinterpret_cast< int* > ( smoke_count ) = 0;
     }
@@ -105,7 +105,8 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
 
             if ( g_local && g_local->is_alive( ) )
             {
-
+                //globals.last_local_eye_ang = g_local->eye_angles().yaw;
+                //globals.fake_yaw_add = globals.last_local_eye_ang - globals.real_yaw;
             }
 
             break;
@@ -116,6 +117,9 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
 
     case FRAME_RENDER_START:
 
+        //animation_fix::get().on_frame_stage_notify();
+
+        //anti_aim::get().set_thirdperson_angle();
         static auto load_named_sky = reinterpret_cast< void ( __fastcall*) ( const char* ) > ( g_utils.pattern_scan ( xor_str ( "engine.dll" ),
                                                                                                                       xor_str (
                                                                                                                           "55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45" ) )
@@ -183,11 +187,12 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
             *reinterpret_cast< int* > ( reinterpret_cast< uintptr_t > ( entity ) + 0xA64 ) = interfaces::global_vars->framecount;
 
             auto state = entity->get_base_player_anim_state( );
+            //entity->set_vangle ( entity->eye_angles() );
             entity->set_abs_original ( entity->vec_origin( ) );
 
             if ( state )
             {
-                state->m_flFeetYawRate = 1.f;
+                //state->m_flFeetYawRate = 1.f;
 
                 if ( entity->vec_velocity( ).length2d( ) < 0.1f )
                     * reinterpret_cast< float* > ( reinterpret_cast< uintptr_t > ( state ) + 292 ) = 0.f;
@@ -209,7 +214,7 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
                 PVOID pEntity = nullptr;
                 pEntity = UTIL_PlayerByIndex ( g_local->ent_index( ) );
 
-                if ( pEntity )
+                if ( pEntity && false)
                 {
                     __asm
                     {
@@ -224,6 +229,16 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
 
 #endif // _DEBUG
 
+                //if ( interfaces::client_state->iChokedCommands == 0 )
+                //static auto ang = g_features.anti_aim.get_last_sent_real_angle();
+
+                //if ( interfaces::client_state->iChokedCommands == 0 )
+                //    ang = g_features.anti_aim.get_last_sent_real_angle();
+
+                //g_local->set_vangle ( ang );
+
+                //globals.fsn_real_ang = ang;
+
                 if ( state )
                 {
                     if ( g_local->vec_velocity( ).length2d( ) < 0.1f )
@@ -237,6 +252,15 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
         break;
 
     case FRAME_RENDER_END:
+        //for ( auto i = 1; i < interfaces::engine_client->get_max_clients(); i++ )
+        //{
+        //    auto entity = dynamic_cast<C_BasePlayer*> ( interfaces::entity_list->get_client_entity ( i ) );
+
+        //    if ( !entity || !g_local || !entity->is_player() || entity->is_local() || entity->is_dormant() || !entity->is_alive() )
+        //        continue;
+
+        //    globals.backup_abs_ang[i] = entity->get_abs_angles(  );
+        //}
 
         break;
     }

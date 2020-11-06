@@ -208,6 +208,7 @@ public:
     //cfg ( int, ragebot_antiaim_desync_mode )
     cfg ( std::string, ragebot_antiaim_desync_mode )
     cfg ( int, ragebot_antiaim_fakeduck_key )
+    cfg ( int, desync_switch_key )
     //cfg ( bool, ragebot_accuracy_slowwalk );
     cfg ( int, ragebot_accuracy_slowwalk_key )
     cfg ( float, ragebot_accuracy_slowwalk_speed )

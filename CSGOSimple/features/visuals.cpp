@@ -1082,7 +1082,7 @@ void c_visuals::add_to_draw_list ( )
                     player.render_health( );
             }
 
-            player.draw_damage ( entity );
+           // player.draw_damage ( entity );
         }
 
         if ( g_options.esp_world_weapons && entity->is_weapon( ) )
@@ -1092,7 +1092,7 @@ void c_visuals::add_to_draw_list ( )
     }
 
     draw_offscreenesp( );
-    draw_hitmarker( );
+    //draw_hitmarker( );
     draw_indicators( );
 
     if ( g_options.visuals_manual_aa_indicator )

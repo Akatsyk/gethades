@@ -167,7 +167,7 @@ void new_anti_aim::run_lby_predication ( )
         m_next_lby_update = 0.f;
     }
 
-    if ( state->get_vec_velocity( ).length2d( ) > 0.1f )
+    if ( state->m_vVelocityY.length2d( ) > 0.1f )
         m_next_lby_update = globals.curtime + 0.22f;
     else if ( m_next_lby_update == -1 || globals.curtime >= m_next_lby_update )
         m_next_lby_update = globals.curtime + 1.1f;

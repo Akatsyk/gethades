@@ -7,6 +7,8 @@
 #include "../options.h"
 #include "menu.hpp"
 #include "../features/features.h"
+#include <algorithm>
+
 Color text_selected = g_options.menu_color1;
 hades_cursor g_cursor;
 
@@ -183,13 +185,18 @@ void c_hades_menu::test_on_draw ( )
             slider_degrees ( xor_str ( "yaw add" ), &g_options.ragebot_antiaim_yaw_add, -180.f, 180.f );
 
             g_options.ragebot_antiaim_yaw_mode = g_features.anti_aim.real_add_antiaim_names.at ( selected_add_antiaim );
-            
+
+            /*
+                set ( xor_str ( "ragebot_antiaim_yaw_jitter_range" ), &g_options.ragebot_antiaim_yaw_jitter_range, 35.f );
+            set ( xor_str ( "ragebot_antiaim_yaw_switch_range" ), &g_options.ragebot_antiaim_yaw_switch_range, 35.f );
+            */
             if ( g_options.ragebot_antiaim_yaw_mode == xor_str ( "jitter" ) )
                 slider_degrees ( xor_str ( "jitter range" ), &g_options.ragebot_antiaim_yaw_jitter_range, 0, 180.f );
             else if ( g_options.ragebot_antiaim_yaw_mode == xor_str ( "switch" ) )
                 slider_degrees ( xor_str ( "switch range" ), &g_options.ragebot_antiaim_yaw_switch_range, -180.f, 180.f );
 
             //static float degree_test = 0.f;
+            //slider_degrees ( "yaw add", &degree_test, -180, 180 );
             label ( xor_str ( "manual aa right" ) );
             keybind ( &g_options.ragebot_antiaim_manual_right_key );
             label ( xor_str ( "manual aa left" ) );

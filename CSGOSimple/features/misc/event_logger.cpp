@@ -920,7 +920,7 @@ void c_event_logger::on_fire_event ( IGameEvent* event )
             globals.hitmarker.time = interfaces::global_vars->realtime;
             globals.hitmarker.dmg = dmg_health;
             globals.hitmarker.did_kill = health <= 0;
-            interfaces::vgui_surface->play_sound_ ( xor_str ( "buttons\\arena_switch_press_02.wav" ) );
+            //interfaces::vgui_surface->play_sound_ ( xor_str ( "buttons\\arena_switch_press_02.wav" ) );
 
             const auto player_hurt = reinterpret_cast< C_BasePlayer* > ( interfaces::entity_list->get_client_entity ( hurt ) );
 
@@ -1466,15 +1466,15 @@ void c_event_logger::draw_beam ( Vector startpos, Color color, Vector pos ) cons
     const auto colorbeams = g_options.visuals_beams_bullet_tracer;
     BeamInfo_t beam_info;
     beam_info.m_nType = TE_BEAMPOINTS;
-    beam_info.m_pszModelName = xor_str ( "sprites/physbeam.vmt" );
-    beam_info.m_nModelIndex = interfaces::mdl_info->get_model_index ( xor_str ( "materials/sprites/physbeam.vmt" ) );
+    beam_info.m_pszModelName = "sprites/purplelaser1.vmt";
+    beam_info.m_nModelIndex = -1;
     beam_info.m_flHaloScale = 0.f;
     beam_info.m_fle = 4.f;
-    beam_info.m_flWidth = 2.f;
-    beam_info.m_flEndWidth = 2.f;
-    beam_info.m_flFadeLength = 0.1f;
-    beam_info.m_flAmplitude = 2.f;
-    beam_info.m_flBrightness = color.a( );
+    beam_info.m_flWidth = 2.0f;
+    beam_info.m_flEndWidth = 2.0f;
+    beam_info.m_flFadeLength = 0.0f;
+    beam_info.m_flAmplitude = 2.0f;
+    beam_info.m_flBrightness = 255.f;
     beam_info.m_flSpeed = 0.2f;
     beam_info.m_nStartFrame = 0;
     beam_info.m_flFrameRate = 0.f;
@@ -1485,6 +1485,7 @@ void c_event_logger::draw_beam ( Vector startpos, Color color, Vector pos ) cons
     beam_info.m_nSegments = 2;
     beam_info.m_bRenderable = true;
     beam_info.m_nFlags = FBEAM_ONLYNOISEONCE | FBEAM_NOTILE | FBEAM_HALOBEAM;
+
 
     static auto last_r = Vector ( g_math.random_float ( -0.5f, 0.5f ), g_math.random_float ( -0.5f, 0.5f ), g_math.random_float ( -0.5f, 0.5f ) );
     static auto last_time = interfaces::global_vars->curtime;

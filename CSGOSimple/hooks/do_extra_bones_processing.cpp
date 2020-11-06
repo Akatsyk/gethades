@@ -1,39 +1,42 @@
 ﻿#include "hooks.hpp"
 #include "listener_entity.h"
+#include "..\features\features.h"
 #include "../helpers/console.h"
 
-int __fastcall hooks::hk_calc_view ( void* ecx, double st0, int Angle, int a3, int a4, int a5, float* a6 )
+int __fastcall hooks::hk_calc_view(void* ecx, double st0, int Angle, int a3, int a4, int a5, float* a6)
 {
-    const auto e = reinterpret_cast< C_BasePlayer* > ( ecx );
+	const auto player = reinterpret_cast<C_BasePlayer*> (ecx);
 
-    return g_listener_entity.m_track[ e->ent_index( ) ].vmt.get_original< hooks::calc_view_t > ( index::calc_view ) ( ecx, st0, Angle, a3, a4, a5, a6 );
+	if (!player || !player->is_local())
+		return g_listener_entity.m_track[player->ent_index()].vmt.get_original< hooks::calc_view_t >(index::calc_view) (ecx, st0, Angle, a3, a4, a5, a6);
+
+	auto new_animstate = player->get_offset<bool>(0x3AB4);
+
+	player->set_offset<int>(0x3AB4, false);
+
+	g_listener_entity.m_track[player->ent_index()].vmt.get_original< hooks::calc_view_t >(index::calc_view) (ecx, st0, Angle, a3, a4, a5, a6);
+
+	player->set_offset<int>(0x3AB4, new_animstate);
 }
 
-void __fastcall hooks::hk_do_extra_bones_processing ( void* ecx, void*, CStudioHdr* hdr, Vector* pos, quaternion_t* q, matrix3x4_t* matrix,
-                                                      void* bone_list, void* context )
+void __fastcall hooks::hk_do_extra_bones_processing(void* ecx, void*, CStudioHdr* hdr, Vector* pos, quaternion_t* q, matrix3x4_t* matrix, void* bone_list, void* context)
 {
-    const auto e = reinterpret_cast< C_BasePlayer* > ( ecx );
+	const auto player = reinterpret_cast<C_BasePlayer*> (ecx);
 
-    auto state = e->get_base_player_anim_state( );
-    const auto val = reinterpret_cast< float* > ( reinterpret_cast< uintptr_t > ( state ) + 292 );
-    const auto backup = *val;
-    auto backup_onground = false;
+	c_base_player_anim_state* animstate = player->get_base_player_anim_state();
+	C_BasePlayer* backup{ nullptr };
 
-    if ( state )
-    {
-        backup_onground = state->m_bOnGround;
-        state->m_bOnGround = false;
+	if (animstate)
+	{
+		backup = animstate->m_pBaseEntity;
+		animstate->m_pBaseEntity = nullptr;
+	}
 
-        if ( g_local->vec_velocity( ).length2d( ) < 0.1f )
-            *val = 0.f;
-    }
+	g_listener_entity.m_track[player->ent_index()].vmt.get_original< hooks::do_extra_bones_processing_t >
+		(index::do_extra_bones_processing) (ecx, hdr, pos, q, matrix, bone_list, context);
 
-    g_listener_entity.m_track[ e->ent_index( ) ].vmt.get_original< hooks::do_extra_bones_processing_t > ( index::do_extra_bones_processing ) (
-        ecx, hdr, pos, q, matrix, bone_list, context );
+	if (animstate && backup)
+		animstate->m_pBaseEntity = backup;
 
-    if ( state )
-    {
-        *val = backup;
-        state->m_bOnGround = backup_onground;
-    }
+	return;
 }

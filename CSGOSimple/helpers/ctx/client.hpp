@@ -5,13 +5,14 @@ class usercmd_t;
 
 namespace ctx
 {
-    struct client_t
-    {
-        C_BasePlayer* local = nullptr;
-        usercmd_t* cmd = nullptr;
-        bool should_choke = false;
-        bool should_setup_local_bones = false;
-    };
+	struct client_t
+	{
+		C_BasePlayer* local = nullptr;
+		usercmd_t* cmd = nullptr;
+		bool should_choke = false;
+		bool should_setup_local_bones = false;
+		int TargetIndex = 0;
+	};
 
-    extern client_t client;
+	extern client_t client;
 }

@@ -37,7 +37,7 @@ void c_debug_overlay::on_add_to_draw_list ( )
     std::string feet_yaw = xor_str ( "feet_yaw: " ) + std::to_string ( state->m_current_feet_yaw );
     std::string real_yaw = xor_str ( "real_yaw_client: " ) + std::to_string ( globals.real_yaw );
     std::string fake_yaw = xor_str ( "fake_yaw_client: " ) + std::to_string ( globals.real_yaw + globals.fake_yaw_add );
-    std::string choked_cmd = xor_str ( "choked_cmds: " ) + std::to_string ( interfaces::client_state->chokedcommands );
+    std::string choked_cmd = xor_str ( "choked_cmds: " ) + std::to_string ( interfaces::client_state->iChokedCommands );
     std::string pitch = xor_str ( "pitch: " ) + std::to_string ( g_local->eye_angles().pitch );
     std::string max_desync_yaw = xor_str ( "max_desync: " ) + std::to_string ( g_local->get_max_desync_delta() );
     */

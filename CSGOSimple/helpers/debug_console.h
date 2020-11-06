@@ -4,10 +4,8 @@
 
 namespace debug_console
 {
-    void print ( const std::string& msg );
-#ifdef _DEBUG
-    void debug ( const std::string& msg );
-#endif // _DEBUG
+	void print(const std::string& msg);
+	void debug(const std::string& msg);
 
-    void clear ( );
+	void clear();
 };

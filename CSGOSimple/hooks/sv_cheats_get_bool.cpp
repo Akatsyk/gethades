@@ -4,7 +4,7 @@
 
 namespace hooks
 {
-    auto dw_cam_think = g_utils.pattern_scan ( xor_str ( "client_panorama.dll" ), xor_str ( "85 C0 75 30 38 86" ) );
+    auto dw_cam_think = g_utils.pattern_scan ( xor_str ( "client.dll" ), xor_str ( "85 C0 75 30 38 86" ) );
     typedef bool ( __thiscall* svc_get_bool_t ) ( PVOID );
 
     bool __fastcall hk_sv_cheats_get_bool ( const PVOID con_var, void* edx )

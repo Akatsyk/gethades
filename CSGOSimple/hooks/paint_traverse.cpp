@@ -66,9 +66,7 @@ void __stdcall hooks::hk_paint_traverse ( const vgui::VPANEL panel, const bool f
         g_features.visuals.add_to_draw_list( );
 
         //g_lua.on_function_call ( xor_str ( "draw" ) );
-        if ( interfaces::engine_client->is_in_game( ) )
-            g_lua.on_paint_traverse( );
-        else
+        if ( !interfaces::engine_client->is_in_game( ) )
         {
             g_features.animations.m_should_update_fake = true;
             g_features.animations.m_should_update_real = true;

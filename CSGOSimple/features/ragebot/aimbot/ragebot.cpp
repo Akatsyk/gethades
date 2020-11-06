@@ -70,7 +70,7 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
     if ( !g_options.ragebot_autoshoot )
         cmd->buttons &= ~IN_ATTACK;
 
-    if ( g_options.ragebot_shooting_mode == static_cast< int > ( shooting_modes_t::supress ) && interfaces::client_state->chokedcommands >= 15 )
+    if ( g_options.ragebot_shooting_mode == static_cast< int > ( shooting_modes_t::supress ) && interfaces::client_state->iChokedCommands >= 15 )
         return;
 
     //console::write_line ( "sequence: " + std::to_string ( weapon->get_sequence() ) );
@@ -131,7 +131,7 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
         ball_data.ndata.restore ( entity );
     }
 
-    if ( static_cast< shooting_modes_t > ( g_options.ragebot_shooting_mode ) == shooting_modes_t::antiaim && interfaces::client_state->chokedcommands >= 1 )
+    if ( static_cast< shooting_modes_t > ( g_options.ragebot_shooting_mode ) == shooting_modes_t::antiaim && interfaces::client_state->iChokedCommands >= 1 )
         send_packet = true;
 
     if ( static_cast< shooting_modes_t > ( g_options.ragebot_shooting_mode ) == shooting_modes_t::antiaim && !send_packet )
@@ -170,12 +170,12 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
         return;
     }
 
-    auto_stop ( cmd );
-
     if ( !hit_chance ( ang, entity, g_options.ragebot_hitchance ) )
     {
         if ( using_backtrack )
             org_data.restore ( entity );
+
+        auto_stop(cmd);
 
         return;
     }
@@ -190,6 +190,8 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
         cmd->buttons |= IN_ATTACK2;
     else
         cmd->buttons |= IN_ATTACK;
+
+    send_packet = true;
 
     if ( !using_backtrack )
         g_features.event_logger.set_rbot_data ( entity, entity_index, ang );
@@ -276,7 +278,7 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
 
     debug_console::debug ( "[ DEBUG ] ragebot => hitbox: " + hb
         //+ " shots_fired_at_entity: " + std::to_string ( g_features.resolver.resolver_data[ entity_index ].shots )
-        + " choked: " + std::to_string ( interfaces::client_state->chokedcommands )
+        + " choked: " + std::to_string ( interfaces::client_state->iChokedCommands )
         //+ " method: " + current_method
         //+ " mode: " + current_mode
         + " backtrack: " + std::string ( using_backtrack ? "true" : "false" ) );
@@ -286,20 +288,6 @@ void c_ragebot::on_create_move ( usercmd_t* cmd, bool& send_packet )
 bool c_ragebot::did_shoot_this_tick ( ) const
 {
     return this->did_shoot;
-}
-
-// todo use next 2 functions
-void c_ragebot::set_shooting ( C_BaseCombatWeapon* weapon )
-{
-    const auto wpn_data = weapon->get_cs_weapon_data( );
-
-    if ( wpn_data )
-    {
-        this->next_shot_time = interfaces::global_vars->curtime + *reinterpret_cast< float* > ( reinterpret_cast< uintptr_t > ( wpn_data ) + 0xDC );
-        return;
-    }
-
-    this->next_shot_time = interfaces::global_vars->curtime + ticks_to_time ( 1 );
 }
 
 bool c_ragebot::can_shoot ( ) const
@@ -508,207 +496,6 @@ rbot_baim_modes_t c_ragebot::get_baimmode ( ) const
     return rbot_baim_modes_t::none;
 }
 
-/* todo finish implementation and fix all this code */
-bool c_ragebot::calculate_target_damage ( C_BasePlayer* local, C_BaseCombatWeapon* weapon, float& damage_out, Vector& pos_out, int& hitbox_out,
-                                          bool& using_backtrack_out, backtrack_all_data& backtrackdata_out )
-{
-    const auto baim = get_baimmode( );
-
-    if ( !prepare_hitboxes ( this->player ) )
-        return false;
-
-    can_hit_struct_t can_hit_head;
-
-    auto found_hittable = false;
-    const auto i = this->player->ent_index( );
-
-    auto entity_same_data_as_before = false;
-
-    if ( std::ceil ( last_autowall_data[ i ].last_enemy_eyeang.yaw ) == std::ceil ( this->player->eye_angles( ).yaw )
-        && std::ceil ( last_autowall_data[ i ].last_enemy_eyeang.pitch ) == std::ceil ( this->player->eye_angles( ).pitch )
-        // position check
-        && last_autowall_data[ i ].last_enemy_pos == this->player->get_eye_pos( )
-        && last_autowall_data[ i ].local_eyepos == g_local->get_eye_pos ( g_features.animations.m_real_state )
-    )
-        entity_same_data_as_before = true;
-
-    for ( auto hb : current_hitboxes )
-    {
-        if ( entity_same_data_as_before && !last_autowall_data[ i ].can_hit[ hb.hitbox ] )
-            continue;
-
-        if ( baim == rbot_baim_modes_t::force_baim && ( hb.hitbox == hitbox_head || hb.hitbox == hitbox_neck ) )
-            continue;
-
-        float scale = hb.pointscale;
-
-        std::vector< point_scan_struct_t > points = get_points_for_hitscan ( this->player, hb.hitbox, scale );
-
-        can_hit_struct_t can_hit_center;
-        auto cbest_damage = -1.f;
-        Vector cbest_point;
-
-        std::deque< float > ba_damages = last_autowall_data[ i ].damage[ hb.hitbox ];
-        last_autowall_data[ i ].damage[ hb.hitbox ].clear( );
-
-        const auto ba_size = ba_damages.size( );
-
-        for ( size_t point = 0; point < points.size( ); point++ )
-        {
-            auto dmg = -1.f;
-
-            if ( entity_same_data_as_before && ba_size > point )
-                dmg = ba_damages[ point ];
-            else
-                dmg = g_features.autowall.damage ( points[ point ].pos );
-
-            last_autowall_data[ i ].damage[ hb.hitbox ].push_back ( dmg );
-
-            if ( dmg == -1.f )
-                continue;
-
-            if ( points[ point ].center && dmg >= static_cast< float > ( g_options.ragebot_min_damage ) )
-            {
-                can_hit_center.can_hit = true;
-                can_hit_center.damage = dmg;
-                can_hit_center.pos = points[ point ].pos;
-            }
-
-            if ( dmg > cbest_damage )
-            {
-                cbest_point = points[ point ].pos;
-                cbest_damage = dmg;
-            }
-        }
-
-        if ( can_hit_center.can_hit )
-        {
-            cbest_damage = can_hit_center.damage;
-            cbest_point = can_hit_center.pos;
-        }
-
-        if (
-            baim == rbot_baim_modes_t::baim && hb.hitbox == hitbox_head && cbest_damage >= static_cast< float > ( g_options.ragebot_min_damage ) &&
-            ( !can_hit_head.can_hit || can_hit_head.damage < cbest_damage )
-        )
-        {
-            can_hit_head.can_hit = true; //need to test 4 highest dmg
-            can_hit_head.damage = cbest_damage;
-            can_hit_head.pos = cbest_point;
-            continue;
-        }
-
-        last_autowall_data[ i ].init = true;
-        last_autowall_data[ i ].can_hit[ hb.hitbox ] = cbest_damage != -1.f;
-
-        auto can_baim_kill = (
-            g_options.ragebot_baim_when_lethal && ( ( hb.hitbox == hitbox_chest || hb.hitbox == hitbox_lower_chest ||
-                hb.hitbox == hitbox_stomach || hb.hitbox == hitbox_pelvis ) && cbest_damage >= this->player->health( ) )
-        );
-
-        if ( baim == rbot_baim_modes_t::baim )
-        {
-            switch ( hb.hitbox )
-            {
-            case hitbox_pelvis:
-            case hitbox_stomach:
-            case hitbox_lower_chest:
-            case hitbox_chest:
-                {
-                    if ( cbest_damage != -1.f && cbest_damage >= static_cast< float > ( g_options.ragebot_min_damage ) && ( ( can_hit_body.can_hit &&
-                        cbest_damage > can_hit_body.damage ) || !can_hit_body.can_hit ) )
-                    {
-                        can_hit_body.can_hit = true;
-                        can_hit_body.damage = cbest_damage;
-                        can_hit_body.pos = cbest_point;
-                        can_hit_body.hitbox = hb.hitbox;
-                        can_hit_body.using_backtrack = false;
-                        using_backtrack_out = false;
-                    }
-
-                    break;
-                }
-
-            default:
-                break;
-            }
-        }
-
-        if ( can_baim_kill || ( cbest_damage != -1.f && cbest_damage > damage_out && cbest_damage >= static_cast< float > ( g_options.ragebot_min_damage ) )
-        )
-        {
-            damage_out = cbest_damage;
-            pos_out = cbest_point;
-            //best_baim = hb.hitbox != hitbox_head && hb.hitbox != hitbox_neck && hb.hitbox != hitbox_upper_chest;
-            hitbox_out = hb.hitbox;
-            using_backtrack_out = false;
-            found_hittable = true;
-        }
-    }
-
-    auto backtrack_dmg = 0.f;
-    auto backtrack_pos = Vector ( 0, 0, 0 );
-    backtrack_all_data backtrack_data;
-    auto backtrack_should_overwrite = false;
-
-    auto tmp_backtrack_hitbox = -1;
-
-    if ( process_backtrack_by_damage ( local, weapon, this->player, backtrack_dmg, backtrack_pos, backtrack_data, backtrack_should_overwrite,
-                                       tmp_backtrack_hitbox ) )
-    {
-        if ( backtrack_should_overwrite && ( backtrack_dmg >= damage_out || backtrack_dmg >= this->player->health( ) ) )
-        {
-            damage_out = backtrack_dmg;
-            pos_out = backtrack_pos;
-            using_backtrack_out = true;
-            hitbox_out = tmp_backtrack_hitbox;
-            backtrackdata_out = backtrack_data;
-            found_hittable = true;
-        }
-        else if ( backtrack_dmg > damage_out && backtrack_dmg > g_options.ragebot_min_damage )
-        {
-            damage_out = backtrack_dmg;
-            pos_out = backtrack_pos;
-            hitbox_out = tmp_backtrack_hitbox;
-            backtrackdata_out = backtrack_data;
-            using_backtrack_out = true;
-            found_hittable = true;
-        }
-    }
-
-    /* todo add backtrack to this (its not used rn) */
-    if ( can_hit_body.can_hit && baim == rbot_baim_modes_t::baim )
-    {
-        damage_out = can_hit_body.damage;
-        pos_out = can_hit_body.pos;
-        hitbox_out = can_hit_body.hitbox;
-        using_backtrack_out = can_hit_body.using_backtrack;
-        found_hittable = true;
-
-        if ( using_backtrack_out )
-            backtrackdata_out = can_hit_body.bdata;
-    }
-
-    /* todo put this part into extra function so we can test if no one hit and overwrite it */
-    if ( can_hit_head.can_hit )
-    {
-        damage_out = can_hit_head.damage;
-        pos_out = can_hit_head.pos;
-        using_backtrack_out = false;
-        hitbox_out = hitbox_head;
-        using_backtrack_out = can_hit_head.using_backtrack;
-        found_hittable = true;
-
-        if ( using_backtrack_out )
-            backtrackdata_out = can_hit_head.bdata;
-    }
-
-    last_autowall_data[ i ].last_enemy_eyeang = this->player->eye_angles( );
-    last_autowall_data[ i ].last_enemy_pos = this->player->get_eye_pos( );
-    last_autowall_data[ i ].local_eyepos = g_local->get_eye_pos ( g_features.animations.m_real_state );
-
-    return found_hittable;
-}
 
 bool c_ragebot::calculate_target_backtrack_damage ( C_BasePlayer* local, C_BaseCombatWeapon* weapon, backtrack_all_data& record, float& damage_out,
                                                     Vector& pos_out, int& hitbox_out )
@@ -936,107 +723,6 @@ bool c_ragebot::get_hitbox ( C_BasePlayer* player, int hitbox, Vector& hitbox_po
     g_math.vector_transform ( cached_studio_box->bbmax, cached_matrix[ cached_studio_box->bone ], max );
 
     hitbox_pos = ( min + max ) * 0.5f;
-
-    return true;
-}
-
-bool c_ragebot::get_hitbox_backtrack ( C_BasePlayer* player, int hitbox, Vector& hitbox_pos, backtrack_all_data data )
-{
-    if ( hitbox >= hitbox_max )
-        return false;
-
-    cached_studio_box = cached_studiohitboxset->get_hitbox ( hitbox );
-    //data.ndata.studiohitboxset->get_hitbox ( hitbox ); //cached_studiohitboxset->get_hitbox ( hitbox );
-
-    if ( !cached_studio_box )
-        return false;
-
-    Vector min, max;
-
-    g_math.vector_transform ( cached_studio_box->bbmin, data.ndata.matrix[ cached_studio_box->bone ], min );
-    g_math.vector_transform ( cached_studio_box->bbmax, data.ndata.matrix[ cached_studio_box->bone ], max );
-
-    hitbox_pos = ( min + max ) * 0.5f;
-
-    return true;
-}
-
-bool c_ragebot::start_prediction ( C_BasePlayer* player )
-{
-    if ( in_prediction )
-    {
-#ifdef _DEBUG
-        throw std::exception ( "new prediction started before old one ended" );
-#else
-        std::exception();
-#endif // DEBUG
-    }
-
-    pre_prediction_data.create ( player );
-
-    auto ticks = time_to_ticks ( interfaces::global_vars->curtime - player->simulation_time() );
-    ticks = std::min ( ticks, 2 );
-    ticks = std::max ( ticks, 12 );
-    auto end = player->vec_origin( ) + player->vec_velocity( ) * interfaces::global_vars->interval_per_tick * ticks;
-
-    player->vec_origin( ) = end;
-    player->vec_origin( ) = end;
-    player->set_abs_original ( end );
-
-    if ( !player->setup_bones ( prediction_matrix, maxstudiobones, bone_used_by_anything, player->simulation_time( ) + ticks_to_time ( 0 ) /* xD */ ) )
-        return false;
-
-    in_prediction = true;
-    return true;
-}
-
-void c_ragebot::end_prediction ( C_BasePlayer* player )
-{
-    if ( !in_prediction )
-    {
-#ifdef _DEBUG
-        throw std::exception ( "prediction can not be finished when there is no prediction running" );
-#else
-        std::exception();
-#endif // DEBUG
-    }
-
-    pre_prediction_data.restore ( player );
-
-    in_prediction = false;
-}
-
-bool c_ragebot::get_predicted_hitbox ( C_BasePlayer* player, int hitbox, Vector& hitbox_pos, int& new_tickcount ) const
-{
-    if ( hitbox >= hitbox_max )
-        return false;
-
-    auto ticks = time_to_ticks ( interfaces::global_vars->curtime - player->simulation_time() );
-
-    ticks = std::min ( ticks, 0 );
-
-    if ( ticks > 12 )
-        return false;
-
-    auto state = player->get_base_player_anim_state( );
-
-    if ( !state )
-        return false;
-
-    auto org_vec_origin = player->vec_origin( );
-
-    auto vel_per_tick = player->vec_velocity( ) * interfaces::global_vars->interval_per_tick;
-    player->vec_origin( ) += vel_per_tick * ticks;
-    state->m_vOrigin = player->vec_origin( );
-
-    player->update_client_side_animation( );
-
-    //
-    // getting all data needed to get hitbox pos here
-    //
-
-    player->vec_origin( ) = org_vec_origin;
-    state->m_vOrigin = player->vec_origin( );
 
     return true;
 }
@@ -1301,33 +987,6 @@ void c_ragebot::zeusbot ( usercmd_t* cmd, C_BasePlayer* local, C_BaseCombatWeapo
     send_packet = true;
 }
 
-void c_ragebot::knifebot ( usercmd_t* cmd, C_BasePlayer* local, C_BaseCombatWeapon* weapon )
-{
-    for ( auto i = 0; i < interfaces::engine_client->get_max_clients( ); i++ )
-    {
-        auto entity = dynamic_cast< C_BasePlayer* > ( interfaces::entity_list->get_client_entity ( i ) );
-
-        if ( !entity || !local || !entity->is_player( ) || entity == local || entity->is_dormant( )
-            || !entity->is_alive( ) || !entity->is_enemy( ) )
-            continue;
-
-        if ( !prepare_hitboxes ( entity ) )
-            continue;
-    }
-}
-
-bool c_ragebot::in_fakelag ( C_BasePlayer* player )
-{
-    auto return_val = false;
-
-    if ( simtimes[ player->ent_index( ) ] != player->simulation_time( ) )
-        simtimes[ player->ent_index( ) ] = player->simulation_time( );
-    else
-        return_val = true;
-
-    return return_val;
-}
-
 // todo fix ragebot
 
 bool c_ragebot::get_target_by_damage ( C_BasePlayer* local, C_BaseCombatWeapon* weapon, float& damage,
@@ -1389,7 +1048,7 @@ bool c_ragebot::get_target_by_damage ( C_BasePlayer* local, C_BaseCombatWeapon* 
         if ( found_killable_entity )
             continue;
 
-        const auto baim = get_baimmode( );
+        auto baim = get_baimmode( );
 
         if ( local->vec_origin( ).dist_to ( entity->vec_origin( ) ) > weapon_data->range )
             continue;
@@ -1491,10 +1150,10 @@ bool c_ragebot::get_target_by_damage ( C_BasePlayer* local, C_BaseCombatWeapon* 
             last_autowall_data[ i ].init = true;
             last_autowall_data[ i ].can_hit[ hb.hitbox ] = cbest_damage != -1.f;
 
-            auto can_baim_kill = (
-                g_options.ragebot_baim_when_lethal && ( ( hb.hitbox == hitbox_chest || hb.hitbox == hitbox_lower_chest ||
-                    hb.hitbox == hitbox_stomach || hb.hitbox == hitbox_pelvis ) && cbest_damage >= entity->health( ) )
-            );
+            auto can_baim_kill = ( g_options.ragebot_baim_when_lethal && cbest_damage >= entity->health( ) );
+
+            if (can_baim_kill)
+                baim = rbot_baim_modes_t::baim;
 
             if ( baim == rbot_baim_modes_t::baim )
             {

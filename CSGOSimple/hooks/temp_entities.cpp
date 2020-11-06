@@ -5,19 +5,19 @@
 #include "../helpers/math.hpp"
 #include "../features/features.h"
 
-void CL_ParseEventDelta ( void* RawData, void* pToData, RecvTable* pRecvTable )
+void CL_ParseEventDelta(void* RawData, void* pToData, RecvTable* pRecvTable)
 {
-    // "RecvTable_DecodeZeros: table '%s' missing a decoder.", look at the function that calls it.
-    static uintptr_t CL_ParseEventDeltaF = reinterpret_cast< uintptr_t > ( g_utils.pattern_scan ( xor_str ( "engine.dll" ),
-                                                                                                  ( xor_str ( "55 8B EC 83 E4 F8 53 57" ) ) ) );
-    __asm
-    {
-        mov ecx, RawData
-        mov edx, pToData
-        push pRecvTable
-        call CL_ParseEventDeltaF
-        add esp, 4
-    }
+	// "RecvTable_DecodeZeros: table '%s' missing a decoder.", look at the function that calls it.
+	static uintptr_t CL_ParseEventDeltaF = reinterpret_cast<uintptr_t> (g_utils.pattern_scan(xor_str("engine.dll"),
+		(xor_str("55 8B EC 83 E4 F8 53 57"))));
+	__asm
+	{
+		mov ecx, RawData
+		mov edx, pToData
+		push pRecvTable
+		call CL_ParseEventDeltaF
+		add esp, 4
+	}
 };
 
 // todo update this so we can use it
@@ -114,7 +114,8 @@ void CL_ParseEventDelta ( void* RawData, void* pToData, RecvTable* pRecvTable )
 //                    if ( TICKS_TO_TIME ( record.m_iTickCount ) <= event_time )
 //                    {
 //                        shot_time = record.m_flSimulationTime + ( event_time - TICKS_TO_TIME ( record.m_iTickCount ) ); // also get choked from this
-//                        #ifdef _DEBUG
+//                        #ifdef 
+
 //                        g_CVar->ConsoleColorPrintf ( Color ( 0, 255, 0, 255 ), "Found exact shot time: %f, ticks choked to get here: %d\n", shot_time, time_to_ticks ( event_time - TICKS_TO_TIME ( record.m_iTickCount ) ) );
 //                        #endif
 //                        break;

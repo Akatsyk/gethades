@@ -76,7 +76,12 @@ public:
 
             this->player = player;
 
-            auto current_length = 0.f;
+            //auto current_length = 0.f;
+
+            //if ( std::round ( this->last_angle.pitch ) ==  std::round ( player->eye_angles(  ).pitch ) )
+            //{
+            //    current_length = (g_local->)
+            //}
 
             if ( this->is_979_playing( ) )
                 this->times.last_979 = player->simulation_time( );

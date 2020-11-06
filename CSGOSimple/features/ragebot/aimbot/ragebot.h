@@ -106,7 +106,6 @@ public:
     bool did_shoot_this_tick ( ) const;
 
     float next_shot_time = 0.f;
-    void set_shooting ( C_BaseCombatWeapon* weapon );
     bool can_shoot ( ) const;
 
     std::deque< aimbot_bone_data_struct_t > aimbot_shots_data;
@@ -148,20 +147,6 @@ private:
      * \return the baimmode to use
      */
     rbot_baim_modes_t get_baimmode ( ) const;
-
-    /**
-     * \brief
-     * \param local local player entity
-     * \param weapon local player weapon entity
-     * \param damage_out predicted damage output
-     * \param pos_out position output
-     * \param hitbox_out hitbox id output
-     * \param using_backtrack_out is using backtrack output
-     * \param backtrackdata_out backtrack record output
-     * \return whether it can hit the entity or not
-     */
-    bool calculate_target_damage ( C_BasePlayer* local, C_BaseCombatWeapon* weapon, float& damage_out, Vector& pos_out, int& hitbox_out,
-                                   bool& using_backtrack_out, backtrack_all_data& backtrackdata_out );
 
     /**
      * \brief

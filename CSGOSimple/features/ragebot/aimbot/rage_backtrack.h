@@ -7,8 +7,8 @@
 struct player_backtrack_t
 {
 public:
-    bool backup ( C_BasePlayer* player, matrix3x4_t* matrix );
-    bool restore ( C_BasePlayer* player );
+    bool backup(C_BasePlayer* player, matrix3x4_t* matrix);
+    bool restore(C_BasePlayer* player);
 
     matrix3x4_t m_matrix[maxstudiobones];
 private:
@@ -18,36 +18,36 @@ private:
 
 struct player_backup_data_t
 {
-    player_backup_data_t ( );
+    player_backup_data_t();
 
-    bool create ( C_BasePlayer* player )
+    bool create(C_BasePlayer* player)
     {
-        if ( !player->setup_bones ( matrix, maxstudiobones, bone_used_by_anything, player->simulation_time( ) ) )
+        if (!player->setup_bones(matrix, maxstudiobones, bone_used_by_anything, player->simulation_time()))
             return false;
 
-        vec_velocity = player->vec_velocity( );
-        lower_body_yaw = player->lower_body_yaw_target( );
-        flags = player->flags( );
+        vec_velocity = player->vec_velocity();
+        lower_body_yaw = player->lower_body_yaw_target();
+        flags = player->flags();
         //min = player->get
-        min = player->get_collideable( )->obb_mins( );
-        max = player->get_collideable( )->obb_maxs( );
+        min = player->get_collideable()->obb_mins();
+        max = player->get_collideable()->obb_maxs();
 
-        auto renderable = player->get_client_renderable( );
-        uintptr_t* bonecache = *reinterpret_cast< uintptr_t** > ( reinterpret_cast< uintptr_t > ( renderable ) + 0x290C );
-        const uint32_t count = *reinterpret_cast< uintptr_t* > ( reinterpret_cast< uintptr_t > ( renderable ) + 0x2918 );
+        auto renderable = player->get_client_renderable();
+        uintptr_t* bonecache = *reinterpret_cast<uintptr_t**> (reinterpret_cast<uintptr_t> (renderable) + 0x290C);
+        const uint32_t count = *reinterpret_cast<uintptr_t*> (reinterpret_cast<uintptr_t> (renderable) + 0x2918);
         max_bones_count = count;
-        memcpy ( bone_matrix_cache, bonecache, sizeof ( matrix3x4_t ) * ( count < 256 ? count : 256 ) );
+        memcpy(bone_matrix_cache, bonecache, sizeof(matrix3x4_t) * (count < 256 ? count : 256));
 
-        heav_armor = player->has_heavy_armor( );
-        armor = player->armor_value( );
-        origin = player->vec_origin( );
+        heav_armor = player->has_heavy_armor();
+        armor = player->armor_value();
+        origin = player->vec_origin();
 
         init = true;
 
         return true;
     }
 
-    bool restore ( C_BasePlayer* player ) const;
+    bool restore(C_BasePlayer* player) const;
 
     bool init = false;
     /* matrix and hitbox data */
@@ -70,7 +70,7 @@ struct player_backup_data_t
 
 struct backtrack_optimize_data
 {
-    Vector local_pos = Vector ( 0, 0, 0 );
+    Vector local_pos = Vector(0, 0, 0);
     bool did_run_autowall[hitbox_max]{ };
     float autowall_dmg[hitbox_max]{ };
     Vector hitbox_positions[hitbox_max];
@@ -78,12 +78,12 @@ struct backtrack_optimize_data
 
 struct backtrack_all_data
 {
-    bool operator== ( const backtrack_all_data& d ) const
+    bool operator== (const backtrack_all_data& d) const
     {
         return simtime == d.simtime && creation_time == d.creation_time;
     }
 
-    bool operator!= ( const backtrack_all_data& d ) const
+    bool operator!= (const backtrack_all_data& d) const
     {
         return simtime != d.simtime || creation_time != d.creation_time;
     }
@@ -92,20 +92,20 @@ struct backtrack_all_data
     c_resolver::resolver_data_t rdata;
     float simtime = 0.f;
     backtrack_optimize_data adata;
-    Vector last_local_eye_awall_pos = Vector ( 0, 0, 0 );
+    Vector last_local_eye_awall_pos = Vector(0, 0, 0);
     float creation_time = 0.f;
 };
 
 class c_rage_backtrack
 {
 public:
-    void on_create_move ( );
-    float get_lerp_time ( ) const;
-    bool tick_valid ( int tick ) const;
-    player_backup_data_t get_normal_data ( int i ) const;
-    backtrack_all_data get_last_backtrack_data ( int i );
+    void on_create_move();
+    float get_lerp_time() const;
+    bool tick_valid(int tick) const;
+    player_backup_data_t get_normal_data(int i) const;
+    backtrack_all_data get_last_backtrack_data(int i);
     std::deque< backtrack_all_data > saved_data[64];
     //matrix3x4_t overwrite_matrix[maxstudiobones];
 private:
-    void add_record ( );
+    void add_record();
 };

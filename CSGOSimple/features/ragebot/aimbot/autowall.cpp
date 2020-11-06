@@ -139,7 +139,7 @@ void c_autowall::scale_damage ( int hitgroup, C_BasePlayer* enemy, float weapon_
     }
 }
 
-static auto util_cliptrace_address = reinterpret_cast< uintptr_t > ( g_utils.pattern_scan ( xor_str ( "client_panorama.dll" ),
+static auto util_cliptrace_address = reinterpret_cast< uintptr_t > ( g_utils.pattern_scan ( xor_str ( "client.dll" ),
                                                                                             xor_str (
                                                                                                 "53 8b dc 83 ec 08 83 e4 f0 83 c4 04 55 8b 6b 04 89 6c 24 04 8b ec 81 ec ? ? ? ? 8b 43 10"
                                                                                             ) ) );
@@ -201,7 +201,7 @@ bool c_autowall::simulate_fire_bullet ( C_BaseEntity* local, C_BaseCombatWeapon*
 }
 
 static auto o_trace_to_exit = reinterpret_cast< uintptr_t > ( g_utils.pattern_scan (
-    xor_str ( "client_panorama.dll" ),
+    xor_str ( "client.dll" ),
     xor_str ( "55 8B EC 83 EC 30 F3 0F 10 75" ) ) );
 
 bool c_autowall::trace_to_exitalt ( Vector& end, CGameTrace& tr, Vector start, Vector v_end, CGameTrace* trace ) const

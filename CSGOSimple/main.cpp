@@ -72,39 +72,10 @@ DWORD WINAPI OnDllAttachStart ( LPVOID base )
     //
     // Wait at most 10s for the main game modules to be loaded.
     //
-    if ( g_utils.wait_for_modules ( 15000, { L"client_panorama.dll", L"engine.dll", L"shaderapidx9.dll" } ) == WAIT_TIMEOUT )
+    if ( g_utils.wait_for_modules ( 15000, { L"client.dll", L"engine.dll", L"shaderapidx9.dll" } ) == WAIT_TIMEOUT )
     {
         return FALSE; // One or more modules were not loaded in time
     }
-
-    std::set_terminate ( []()
-    {
-        std::exception_ptr ptr;
-        ptr = std::current_exception();
-
-        try
-        {
-            if ( ptr )
-                std::rethrow_exception ( ptr );
-        }
-        catch ( const std::exception& e )
-        {
-            std::string what = e.what();
-            std::wstring t ( what.begin(), what.end() );
-            MessageBoxA ( NULL, what.data(), xor_str ( "error" ), NULL );
-            abort();
-        }
-    } );
-
-    #ifdef _RELEASE
-
-    security.init();
-    #else
-    console::attach();
-    #endif //
-
-    while ( !g_user.is_allowed && !g_unload )
-        std::this_thread::sleep_for ( std::chrono::microseconds ( 50 ) );
 
     if ( g_unload )
     {
@@ -163,13 +134,9 @@ DWORD WINAPI OnDllAttachStart ( LPVOID base )
             g_features.anti_aim.setup(  );
 
             //lua_support::setup();
-            g_lua.setup();
 
             while ( !g_unload )
             {
-                if ( !security.still_valid() )
-                    g_unload = true;
-
                 std::this_thread::sleep_for ( std::chrono::milliseconds ( 500 ) );
             }
 
@@ -272,7 +239,7 @@ DWORD WINAPI OnDllAttachStartHeartbeat ( LPVOID base )
 BOOL WINAPI OnDllDetach()
 {
     #ifdef _DEBUG
-    console::detach();
+    console::attach();
     #endif
 
     menu.shutdown();

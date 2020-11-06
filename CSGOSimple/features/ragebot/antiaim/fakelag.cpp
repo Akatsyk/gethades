@@ -12,13 +12,13 @@ void c_fakelag::on_create_move ( usercmd_t* cmd, bool& send_packet )
 
     if ( ticks_to_choke != 0 )
     {
-        if ( static_cast< int > ( interfaces::client_state->chokedcommands ) <= ticks_to_choke )
+        if ( static_cast< int > ( interfaces::client_state->iChokedCommands ) <= ticks_to_choke )
             send_packet = false;
     }
 
     static auto last_pos = Vector ( 0, 0, 0 );
 
-    if ( interfaces::client_state->chokedcommands == 0 )
+    if ( interfaces::client_state->iChokedCommands == 0 )
     {
         globals.breaking_lc = ( g_local->vec_origin( ) - last_pos ).length_sqr( ) > 4096.f;
         last_pos = g_local->vec_origin( );

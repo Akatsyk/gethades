@@ -14,12 +14,16 @@
     <ProjectGuid>{F3E42845-8D56-4BB3-821D-8163AB1337F0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>csgosdk</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>hades csgo</ProjectName>
-    <SccProjectName>SAK</SccProjectName>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccProvider>
+    </SccProvider>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
   </PropertyGroup>
@@ -52,19 +56,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)build\</OutDir>
-    <IntDir>$(SolutionDir)build\intermediate\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include;</IncludePath>
-    <TargetName>gethades</TargetName>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include;</IncludePath>
-    <TargetName>cheat</TargetName>
+    <TargetName>LSD</TargetName>
     <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\output</OutDir>
+    <IntDir>$(SolutionDir)\intermediate</IntDir>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK\June 2010\Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <TargetName>cheat</TargetName>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK\June 2010\Lib;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -74,7 +78,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CSGOSIMPLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <SDLCheck>false</SDLCheck>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -85,16 +89,16 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;lua.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Visual Leak Detector\lib\Win32;</AdditionalLibraryDirectories>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
-      <AdditionalOptions>/FORCE %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>
@@ -104,20 +108,22 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <SupportJustMyCode>false</SupportJustMyCode>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <GenerateMapFile>true</GenerateMapFile>
-      <AdditionalDependencies>lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)\CSGOSimple\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -142,45 +148,11 @@
     <ClCompile Include="hooks\get_eye_angles.cpp" />
     <ClCompile Include="hooks\in_prediction.cpp" />
     <ClCompile Include="hooks\is_hltv.cpp" />
+    <ClCompile Include="hooks\loose_file_allowed.cpp" />
     <ClCompile Include="hooks\post_data_update.cpp" />
     <ClCompile Include="hooks\update_client_side_animation.cpp" />
     <ClCompile Include="hooks\wnd_proc.cpp" />
     <ClCompile Include="hooks\listener_entity.cpp" />
-    <ClCompile Include="lua\lapi.c" />
-    <ClCompile Include="lua\lauxlib.c" />
-    <ClCompile Include="lua\lbaselib.c" />
-    <ClCompile Include="lua\lbitlib.c" />
-    <ClCompile Include="lua\lcode.c" />
-    <ClCompile Include="lua\lcorolib.c" />
-    <ClCompile Include="lua\lctype.c" />
-    <ClCompile Include="lua\ldblib.c" />
-    <ClCompile Include="lua\ldebug.c" />
-    <ClCompile Include="lua\ldo.c" />
-    <ClCompile Include="lua\ldump.c" />
-    <ClCompile Include="lua\lfunc.c" />
-    <ClCompile Include="lua\lgc.c" />
-    <ClCompile Include="lua\linit.c" />
-    <ClCompile Include="lua\liolib.c" />
-    <ClCompile Include="lua\llex.c" />
-    <ClCompile Include="lua\lmathlib.c" />
-    <ClCompile Include="lua\lmem.c" />
-    <ClCompile Include="lua\loadlib.c" />
-    <ClCompile Include="lua\lobject.c" />
-    <ClCompile Include="lua\lopcodes.c" />
-    <ClCompile Include="lua\loslib.c" />
-    <ClCompile Include="lua\lparser.c" />
-    <ClCompile Include="lua\lstate.c" />
-    <ClCompile Include="lua\lstring.c" />
-    <ClCompile Include="lua\lstrlib.c" />
-    <ClCompile Include="lua\ltable.c" />
-    <ClCompile Include="lua\ltablib.c" />
-    <ClCompile Include="lua\ltm.c" />
-    <ClCompile Include="lua\lua.c" />
-    <ClCompile Include="lua\luac.c" />
-    <ClCompile Include="lua\lundump.c" />
-    <ClCompile Include="lua\lutf8lib.c" />
-    <ClCompile Include="lua\lvm.c" />
-    <ClCompile Include="lua\lzio.c" />
     <ClCompile Include="lua\setup.cpp" />
     <ClCompile Include="menu\hades_menu.cpp" />
     <ClCompile Include="helpers\debug_console.cpp" />
@@ -258,6 +230,7 @@
     <ClInclude Include="helpers\ctx\cheat.h" />
     <ClInclude Include="helpers\ctx\client.hpp" />
     <ClInclude Include="helpers\ctx\ctx.hpp" />
+    <ClInclude Include="detours\detours.h" />
     <ClInclude Include="helpers\helpers.h" />
     <ClInclude Include="helpers\lazyimporter.h" />
     <ClInclude Include="helpers\security\heartbeat\heartbeat.h" />
@@ -268,33 +241,7 @@
     <ClInclude Include="include\json.h" />
     <ClInclude Include="hooks\listener_entity.h" />
     <ClInclude Include="include\sol.h" />
-    <ClInclude Include="lua\lapi.h" />
-    <ClInclude Include="lua\lauxlib.h" />
-    <ClInclude Include="lua\lcode.h" />
-    <ClInclude Include="lua\lctype.h" />
-    <ClInclude Include="lua\ldebug.h" />
-    <ClInclude Include="lua\ldo.h" />
-    <ClInclude Include="lua\lfunc.h" />
-    <ClInclude Include="lua\lgc.h" />
-    <ClInclude Include="lua\llex.h" />
-    <ClInclude Include="lua\llimits.h" />
-    <ClInclude Include="lua\lmem.h" />
-    <ClInclude Include="lua\lobject.h" />
-    <ClInclude Include="lua\lopcodes.h" />
-    <ClInclude Include="lua\lparser.h" />
-    <ClInclude Include="lua\lprefix.h" />
-    <ClInclude Include="lua\lstate.h" />
-    <ClInclude Include="lua\lstring.h" />
-    <ClInclude Include="lua\ltable.h" />
-    <ClInclude Include="lua\ltm.h" />
-    <ClInclude Include="lua\lua.h" />
-    <ClInclude Include="lua\lua.hpp" />
-    <ClInclude Include="lua\luaconf.h" />
-    <ClInclude Include="lua\lualib.h" />
     <ClInclude Include="lua\lua_support.h" />
-    <ClInclude Include="lua\lundump.h" />
-    <ClInclude Include="lua\lvm.h" />
-    <ClInclude Include="lua\lzio.h" />
     <ClInclude Include="lua\types.h" />
     <ClInclude Include="menu\hades_menu.h" />
     <ClInclude Include="helpers\debug_console.h" />

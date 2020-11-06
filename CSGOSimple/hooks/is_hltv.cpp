@@ -1,8 +1,8 @@
 #include "hooks.hpp"
 #include "../helpers/console.h"
 
-auto ptr_accumulate_layers = g_utils.pattern_scan ( xor_str ( "client_panorama.dll" ), xor_str ( "84 C0 75 0D F6 87" ) );
-auto setupvelocity_call = reinterpret_cast< void* > ( g_utils.pattern_scan ( xor_str ( "client_panorama.dll" ),
+auto ptr_accumulate_layers = g_utils.pattern_scan ( xor_str ( "client.dll" ), xor_str ( "84 C0 75 0D F6 87" ) );
+auto setupvelocity_call = reinterpret_cast< void* > ( g_utils.pattern_scan ( xor_str ( "client.dll" ),
                                                                              xor_str ( "84 C0 75 38 8B 0D ? ? ? ? 8B 01 8B 80 ? ? ? ? FF D0" ) ) );
 
 bool __fastcall hooks::hk_is_hltv ( )

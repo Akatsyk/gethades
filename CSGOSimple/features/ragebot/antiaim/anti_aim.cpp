@@ -184,7 +184,7 @@ void c_anti_aim::setup ( )
         static auto last_yaw = 0.f;
         static auto st = 0;
 
-        if ( interfaces::client_state->chokedcommands == 0 )
+        if ( interfaces::client_state->iChokedCommands == 0 )
         {
             st++;
 
@@ -208,7 +208,7 @@ void c_anti_aim::setup ( )
     {
         static auto last_real = 0.f;
 
-        if ( interfaces::client_state->chokedcommands == 0 )
+        if ( interfaces::client_state->iChokedCommands == 0 )
         {
             static auto sw = false;
             cmd->viewangles.yaw += sw ? g_options.ragebot_antiaim_yaw_switch_range : -g_options.ragebot_antiaim_yaw_switch_range;
@@ -231,11 +231,17 @@ void c_anti_aim::setup ( )
     } );
     this->register_desync_antiaim ( xor_str ( "static" ), [&] ( const std::string& /*unused*/, usercmd_t* cmd, bool& send_packet, const float max_rotation )
     {
-        if ( !send_packet )
+            static bool gavna = false;
+            gavna = !gavna;
+            float minmove = g_local->flags() & fl_ducking ? 3.f : 1.f;
+            cmd->sidemove += gavna ? -gavna : minmove;
+
+
+        if ( send_packet )
             return;
 
         m_should_overwrite_real = false;
-        cmd->viewangles.yaw -= max_rotation; // bug fix head lby flick
+        cmd->viewangles.yaw -= 120.f; // bug fix head lby flick
     } );
     this->register_desync_antiaim ( xor_str ( "test" ), [&] ( const std::string& /*unused*/, usercmd_t* cmd, bool& send_packet, const float max_rotation )
     {
@@ -411,6 +417,8 @@ bool c_anti_aim::desync_rotate ( const float rotation, const int direction, user
     else
         cmd->viewangles.yaw += rotate;
 
+    //cmd->viewangles.y = Math::AngleNormalize ( g_Context->m_Cmd->viewangles.y );
+    //cmd->viewangles.yaw =
     g_math.normalize_yaw ( cmd->viewangles.yaw );
     send_packet = false;
     ++m_rotate_iteration;
@@ -434,7 +442,7 @@ void c_anti_aim::run_lby_prediction ( )
         m_next_lby_update_time = 0.f;
     }
 
-    if ( state->get_vec_velocity( ).length2d( ) > 0.1f )
+    if ( state->m_vVelocityY.length2d( ) > 0.1f )
         m_next_lby_update_time = globals.curtime + 0.22f;
     else if ( m_next_lby_update_time == -1.f || globals.curtime >= m_next_lby_update_time )
         m_next_lby_update_time = globals.curtime + 1.1f;
@@ -496,8 +504,9 @@ void c_anti_aim::run_antiaim ( usercmd_t* cmd, bool& send_packet )
 
     this->last_pre_yaw = cmd->viewangles.yaw;
 
-    if ( g_options.ragebot_antiaim_desync_mode == xor_str ( "static" ) )
-        cmd->viewangles.yaw += g_local->get_max_desync_delta( );
+	if (g_options.ragebot_antiaim_desync_mode == xor_str("static"))
+			cmd->viewangles.yaw += g_local->get_max_desync_delta();
+		
 
     // run desync here
     if ( !this->desync_antiaims.empty( ) )
@@ -614,7 +623,7 @@ void c_anti_aim::lby_breaker ( usercmd_t* cmd, bool& send_packet )
             next_update = -1.f;
         }
 
-        if ( state->get_vec_velocity( ).length2d( ) > 0.1f )
+        if ( state->m_vVelocityY.length2d( ) > 0.1f )
             next_update = curtime + 0.22f;
         else if ( next_update == -1.f || curtime >= next_update )
             next_update = curtime + 1.1f;
@@ -638,20 +647,20 @@ void c_anti_aim::lby_breaker ( usercmd_t* cmd, bool& send_packet )
         if ( g_options.ragebot_antiaim_desync_mode == xor_str ( "jitter" ) )
         {
             cmd->viewangles.yaw = last_pre_yaw;
-            switch ( g_options.ragebot_manualaa_mode )
-            {
-            case 0:
-                cmd->viewangles.yaw = last_pre_yaw - 120.f;
-                break;
+            //switch ( g_options.ragebot_manualaa_mode )
+            //{
+            //case 0:
+            //    cmd->viewangles.yaw = last_pre_yaw - 120.f;
+            //    break;
 
-            case 1:
-                cmd->viewangles.yaw = last_pre_yaw - 120.f;
-                break;
+            //case 1:
+            //    cmd->viewangles.yaw = last_pre_yaw - 120.f;
+            //    break;
 
-            case 2:
-                cmd->viewangles.yaw = last_pre_yaw + 180.f;
-                break;
-            }
+            //case 2:
+            //    cmd->viewangles.yaw = last_pre_yaw + 180.f;
+            //    break;
+            //}
         }
         else
             cmd->viewangles.yaw = last_pre_yaw - 120.f;
@@ -704,7 +713,7 @@ void c_anti_aim::finish_antiaim ( usercmd_t* cmd, bool& send_packet )
         this->saved_data.did_shot_last_tick = true;
     }
 
-    if ( interfaces::client_state->chokedcommands == 0 )
+    if ( interfaces::client_state->iChokedCommands == 0 )
     {
         //globals.prev_real_yaw = globals.last_real_yaw;
         //globals.prev_real_pitch = globals.real_pitch;
@@ -854,12 +863,12 @@ void c_anti_aim::fake_crouch ( usercmd_t* cmd, bool& send_packet )
 
     globals.in_fakeduck = true;
 
-    if ( interfaces::client_state->chokedcommands <= 7 )
+    if ( interfaces::client_state->iChokedCommands <= 7 )
         cmd->buttons &= ~IN_DUCK;
     else
         cmd->buttons |= IN_DUCK;
 
-    send_packet = interfaces::client_state->chokedcommands > 14;
+    send_packet = interfaces::client_state->iChokedCommands > 14;
 
     globals.fackeduck_send_packet_overwrite = send_packet;
 }

@@ -53,7 +53,7 @@ long __stdcall hooks::hk_present ( IDirect3DDevice9* m_device, const RECT* sourc
                 state_block->Capture( );
 
                 g_render.setup_states( ); // sets up proper render states for our state block
-                g_features.visuals.inaccuracy ( m_device );
+                //g_features.visuals.inaccuracy ( m_device );
 
                 state_block->Apply( );
                 state_block->Release( );
