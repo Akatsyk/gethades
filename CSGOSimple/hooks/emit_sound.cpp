@@ -30,19 +30,16 @@ void __stdcall hooks::hk_emit_sound1(IRecipientFilter& filter, int iEntIndex, in
             set_ready_fn("");
     }
 
-    if (g_options.ragebot_fakelag_enable)
+    if (strstr(pSample, xor_str("weapon")) && (strstr(pSample, xor_str("draw")) || strstr(pSample, xor_str("deploy"))))
     {
-        if (strstr(pSample, xor_str("weapon")) && (strstr(pSample, xor_str("draw")) || strstr(pSample, xor_str("deploy"))))
-        {
-            static uint32_t prev_hash = 0;
-            const uint32_t hash = (uint32_t)pSample;
+        static uint32_t prev_hash = 0;
+        const uint32_t hash = (uint32_t)pSample;
 
-            if (prev_hash == hash)
-                return ofunc(interfaces::engine_sound, filter, iEntIndex, iChannel, pSoundEntry, nSoundEntryHash, pSample, flVolume, nSeed, flAttenuation, iFlags, iPitch,
-                    pOrigin, pDirection, pUtlVecOrigins, bUpdatePositions, soundtime, speakerentity, unk);
+        if (prev_hash == hash)
+            return ofunc(interfaces::engine_sound, filter, iEntIndex, iChannel, pSoundEntry, nSoundEntryHash, pSample, flVolume, nSeed, flAttenuation, iFlags, iPitch,
+                pOrigin, pDirection, pUtlVecOrigins, bUpdatePositions, soundtime, speakerentity, unk);
 
-            prev_hash = hash;
-        }
+        prev_hash = hash;
     }
 
     if (strstr(pSample, xor_str("null")))

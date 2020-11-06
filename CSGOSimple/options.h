@@ -140,7 +140,7 @@ public:
     cfg ( int, visuals_nosmoke_mode )
     // cfg ( bool, visuals_thirdperson );
     cfg ( int, visuals_thirdperson_key )
-    cfg_local ( bool, visuals_thirdperson_toggle, true );
+    cfg_local ( bool, visuals_thirdperson_toggle, false );
     cfg ( float, visuals_thirdperson_distance )
     cfg ( float, visuals_invisible_players_range )
     cfg ( Color, visuals_offscreen_color );
