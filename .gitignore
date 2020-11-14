@@ -1,0 +1,14 @@
+
+.vs/hades-csgo/v16/.suo
+.vs/hades-csgo/v16/Browse.VC.db
+*.ipch
+*.obj
+*.recipe
+*.log
+*.tlog
+*.dll
+*.map
+*.exe
+*.db-shm
+*.db-wal
+*.opendb

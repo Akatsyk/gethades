@@ -52,7 +52,7 @@ bool C_BaseEntity::is_defuse_kit()
 void C_BaseEntity::standard_blending_rules(studiohdr_t* hdr, Vector* pos, quaternion_t* q, float curtime)
 {
 	using fn = void(__fastcall*) (studiohdr_t*, Vector*, quaternion_t*, float);
-	reinterpret_cast<fn> (reinterpret_cast<uintptr_t> (this->get_client_renderable()) + 804) (hdr, pos, q, curtime);
+	reinterpret_cast<fn> (reinterpret_cast<uintptr_t> (this + 205) ) (hdr, pos, q, curtime);
 }
 
 CCSWeaponInfo* C_BaseCombatWeapon::get_cs_weapon_data()
@@ -217,10 +217,7 @@ bool C_BaseCombatWeapon::is_smg()
 
 bool C_BaseCombatWeapon::is_reloading()
 {
-	static auto in_reload = *reinterpret_cast<uint32_t*> (g_utils.pattern_scan(xor_str("client.dll"),
-		xor_str("C6 87 ? ? ? ? ? 8B 06 8B CE FF 90")) + 2);
-
-	return *reinterpret_cast<bool*> (reinterpret_cast<uintptr_t> (this) + in_reload);
+	return *reinterpret_cast<bool*> (reinterpret_cast<uintptr_t> (this) + 0x32A5);
 }
 
 float C_BaseCombatWeapon::get_inaccuracy()
@@ -388,26 +385,55 @@ void C_BasePlayer::modify_eye_pos(c_base_player_anim_state* animstate, vector_t*
 
 Vector C_BasePlayer::get_eye_pos()
 {
-	auto pos = Vector{ };
-
-	CallVFunction< void(__thiscall*) (void*, Vector*) >(this, 284) (this, &pos);
-
-	if (*reinterpret_cast<int32_t*> (uintptr_t(this) + 0x3AB0))
+	if (globals.in_fakeduck && this->ent_index() == interfaces::engine_client->get_localplayer())
 	{
-		auto anim_state = *reinterpret_cast<void**> (uintptr_t(this) + 0x3914);
+		auto origin = vec_origin();
 
-		if (anim_state)
-			modify_eye_pos(reinterpret_cast<c_base_player_anim_state*> (anim_state), &pos);
+		auto vDuckHullMin = interfaces::game_movement->get_player_mins(true);
+		auto vStandHullMin = interfaces::game_movement->get_player_mins(false);
+
+		float fMore = (vDuckHullMin.z - vStandHullMin.z);
+
+		auto vecDuckViewOffset = interfaces::game_movement->get_player_view_offset(true);
+		auto vecStandViewOffset = interfaces::game_movement->get_player_view_offset(false);
+		float duckFraction = duck_amount();
+
+		float tempz = ((vecDuckViewOffset.z - fMore) * duckFraction) +
+			(vecStandViewOffset.z * (1 - duckFraction));
+
+		origin.z += tempz;
+
+		return origin;
 	}
 
-	return pos;
+	return vec_origin() + view_offset();
 }
 
 vector_t C_BasePlayer::get_eye_pos(void* animstate)
 {
-	auto pos = vector_t{ };
+	if (globals.in_fakeduck && this->ent_index() == interfaces::engine_client->get_localplayer())
+	{
+		auto origin = vec_origin();
 
-	CallVFunction< void(__thiscall*) (void*, vector_t*) >(this, 284) (this, &pos);
+		auto vDuckHullMin = interfaces::game_movement->get_player_mins(true);
+		auto vStandHullMin = interfaces::game_movement->get_player_mins(false);
+
+		float fMore = (vDuckHullMin.z - vStandHullMin.z);
+
+		auto vecDuckViewOffset = interfaces::game_movement->get_player_view_offset(true);
+		auto vecStandViewOffset = interfaces::game_movement->get_player_view_offset(false);
+		float duckFraction = duck_amount();
+
+		float tempz = ((vecDuckViewOffset.z - fMore) * duckFraction) +
+			(vecStandViewOffset.z * (1 - duckFraction));
+
+		origin.z += tempz;
+
+		return origin;
+	}
+
+	auto pos = vector_t{ };
+	pos = vec_origin() + view_offset();
 
 	if (animstate)
 		modify_eye_pos(reinterpret_cast<c_base_player_anim_state*> (animstate), &pos);
@@ -615,8 +641,7 @@ void C_BasePlayer::invalidate_bone_cache()
 
 QAngle* C_BasePlayer::get_vangles()
 {
-	static auto deadflag = g_netvarsys.GetOffset(xor_str("DT_BasePlayer"), xor_str("deadflag"));
-	return reinterpret_cast<QAngle*> (reinterpret_cast<uintptr_t> (this) + deadflag + 0x4);
+	return reinterpret_cast<QAngle*> (reinterpret_cast<uintptr_t> (this) + 0x31D8);
 }
 
 float C_BasePlayer::GetSimulationTime()
@@ -638,10 +663,7 @@ void C_BaseAttributableItem::set_glove_model_index(const int model_index)
 
 float C_BasePlayer::get_flash_bang_time()
 {
-	static uint32_t get_flash_bang_time = *reinterpret_cast<uint32_t*> (reinterpret_cast<uint32_t> (g_utils.pattern_scan(
-		xor_str("client.dll"), xor_str("F3 0F 10 86 ?? ?? ?? ?? 0F 2F 40 10 76 30"))) + 4);
-
-	return *reinterpret_cast<float*> (this + get_flash_bang_time);
+	return *reinterpret_cast<float*> (this + 0xA420);
 }
 
 void C_BaseViewModel::send_view_model_matching_sequence(int sequence)

@@ -84,12 +84,8 @@ void __stdcall hooks::hk_create_move(int sequence_number, float input_sample_fra
 	const auto ofunc = hlclient_hook.get_original< create_move >(index::create_move);
 	ofunc(interfaces::chl_client, sequence_number, input_sample_frametime, b_active);
 
-
 	auto cmd = interfaces::input->get_user_cmd(sequence_number);
 	auto verified = interfaces::input->get_verified_cmd(sequence_number);
-
-	if (!cmd || !cmd->command_number || g_unload)
-		return;
 
 	g_features.event_logger.on_create_move();
 	g_features.animations.player_animations();
@@ -100,6 +96,9 @@ void __stdcall hooks::hk_create_move(int sequence_number, float input_sample_fra
 		send_packet = true;
 		return;
 	}
+
+	if (!cmd || !cmd->command_number || g_unload)
+		return;
 
 	ctx::client.cmd = cmd;
 	ctx::client.local = g_local;
@@ -146,18 +145,21 @@ void __stdcall hooks::hk_create_move(int sequence_number, float input_sample_fra
 	g_features.engine_prediction.run_engine_pred(cmd);
 	/* features inside prediction */
 	//rbot, etc...
+	if (g_options.ragebot_antiaim_enable)
+		g_features.anti_aim.run_lby_prediction();
 
 	g_features.fakelag.on_create_move(cmd, send_packet);
-
-	g_features.rage_backtrack.on_create_move();
-	g_features.ragebot.on_create_move(cmd, send_packet);
 
 	if (g_local->move_type() != MOVETYPE_LADDER && g_local->move_type() != MOVETYPE_FLY)
 		g_features.anti_aim.run_antiaim(cmd, send_packet);
 	else
 		globals.real_yaw = cmd->viewangles.yaw;
 
-	//c_anti_aim::lby_breaker ( cmd, send_packet );
+	g_features.ragebot.on_create_move(cmd, send_packet);
+	g_features.rage_backtrack.on_create_move();
+
+	if (g_options.ragebot_antiaim_enable)
+		g_features.anti_aim.lby_breaker ( cmd, send_packet );
 	
 	c_misc::airduck(cmd);
 
@@ -177,6 +179,41 @@ void __stdcall hooks::hk_create_move(int sequence_number, float input_sample_fra
 
 	if (interfaces::client_state->iChokedCommands >= 15)
 		send_packet = true;
+
+	if (g_options.ragebot_shooting_mode == static_cast<int> (shooting_modes_t::supress) && !globals.in_fakeduck && !g_options.
+		ragebot_fakelag_while_shooting)
+	{
+		static auto last_yaw = 0.f;
+		const auto supressed_tick_delta = interfaces::global_vars->tickcount - globals.prev_supressed_tick;
+
+		static auto sw = false;
+
+		if (supressed_tick_delta == 1)
+		{
+			send_packet = true;
+			cmd->buttons &= ~IN_ATTACK;
+			//sw = !sw;
+			cmd->viewangles.yaw = last_yaw + (sw ? -(g_local->get_max_desync_delta() - 5.f) : (g_local->get_max_desync_delta() - 5.f));
+		}
+
+		if (g_features.ragebot.should_supress)
+		{
+			last_yaw = cmd->viewangles.yaw;
+			g_features.ragebot.should_supress = false;
+			send_packet = false;
+			globals.prev_supressed_tick = interfaces::global_vars->tickcount;
+		}
+	}
+
+	static auto was_attack_in_first_package = false;
+
+	if ((was_attack_in_first_package || cmd->buttons & IN_ATTACK) && interfaces::client_state->iChokedCommands >= 14)
+		send_packet = true;
+
+	if (globals.in_fakeduck)
+		send_packet = globals.fackeduck_send_packet_overwrite;
+
+	was_attack_in_first_package = interfaces::client_state->iChokedCommands == 0 && (cmd->buttons & IN_ATTACK);
 
 	g_features.anti_aim.finish_antiaim(cmd, send_packet);
 

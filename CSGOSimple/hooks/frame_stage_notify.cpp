@@ -117,6 +117,12 @@ void __stdcall hooks::hk_frame_stage_notify ( ClientFrameStage_t stage )
 
     case FRAME_RENDER_START:
 
+        if (interfaces::input->m_fCameraInThirdPerson && g_local && g_local->is_alive())
+        {
+            interfaces::prediction->set_local_view_angles(Vector(g_local->eye_angles().pitch, g_local->eye_angles().yaw, 0));
+            g_local->update_client_side_animation();
+        }
+
         //animation_fix::get().on_frame_stage_notify();
 
         //anti_aim::get().set_thirdperson_angle();

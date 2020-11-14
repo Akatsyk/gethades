@@ -95,7 +95,7 @@ void c_config::setup_config ( )
 
     set ( xor_str ( "visuals_offscreen_enemy" ), &g_options.esp_offscreen_enemyonly, false);
     set ( xor_str ( "visuals_offscreen_color" ), &g_options.visuals_offscreen_color, Color ( 255, 255, 255, 255 ) );
-    set ( xor_str ( "visuals_offscreen_range" ), &g_options.visuals_invisible_players_range, 0.5f );
+    set ( xor_str ( "visuals_offscreen_range" ), &g_options.visuals_invisible_players_range, 0.0f );
 
     set ( xor_str ( "visuals_manual_aa_indicator" ), &g_options.visuals_manual_aa_indicator, false );
     //
@@ -125,7 +125,7 @@ void c_config::setup_config ( )
     set ( xor_str ( "ragebot_hitbox_head_pointscale" ), &g_options.ragebot_hitbox_head_pointscale, false);
     set ( xor_str ( "ragebot_hitbox_neck_pointscale" ), &g_options.ragebot_hitbox_neck_pointscale, false );
     set ( xor_str ( "ragebot_hitbox_stomach_pointscale" ), &g_options.ragebot_hitbox_stomach_pointscale, false);
-    set ( xor_str ( "ragebot_hitbox_chest_pointscale" ), &g_options.ragebot_hitbox_chest_pointscale, true );
+    set ( xor_str ( "ragebot_hitbox_chest_pointscale" ), &g_options.ragebot_hitbox_chest_pointscale, false );
     set ( xor_str ( "ragebot_hitbox_feet_pointscale" ), &g_options.ragebot_hitbox_feet_pointscale, false );
     set ( xor_str ( "ragebot_hitbox_arms_pointscale" ), &g_options.ragebot_hitbox_arms_pointscale, false );
     set ( xor_str ( "ragebot_autostop_mode" ), &g_options.ragebot_autostop_mode, 0 );
@@ -149,7 +149,7 @@ void c_config::setup_config ( )
     set ( xor_str ( "ragebot_antiaim_manual_back_key" ), &g_options.ragebot_antiaim_manual_back_key, 0x0 );
     //set ( xor_str ( "ragebot_accuracy_slowwalk" ), &g_options.ragebot_accuracy_slowwalk, false );
     set ( xor_str ( "ragebot_accuracy_slowwalk_key" ), &g_options.ragebot_accuracy_slowwalk_key, 0 );
-    set ( xor_str ( "ragebot_accuracy_slowwalk_speed" ), &g_options.ragebot_accuracy_slowwalk_speed, 100.f );
+    set ( xor_str ( "ragebot_accuracy_slowwalk_speed" ), &g_options.ragebot_accuracy_slowwalk_speed, 0.f );
     // fake-lag
     set ( xor_str ( "ragebot_fakelag_enable" ), &g_options.ragebot_fakelag_enable, false);
     set ( xor_str ( "ragebot_fakelag_while_unduck" ), &g_options.ragebot_fakelag_while_unduck, false );
@@ -182,8 +182,8 @@ void c_config::setup_config ( )
     set ( xor_str ( "misc_airduck" ), &g_options.misc_airduck, false );
     set ( xor_str ( "misc_slidewalk" ), &g_options.misc_slidewalk, false );
 
-    set ( xor_str ( "menu_color" ), &g_options.menu_color1, Color ( 255, 0, 0, 255 ) );
-    set ( xor_str ( "menu_color_selected" ), &g_options.menu_color_selected, Color ( 255, 0, 0, 255 ) );
+    set ( xor_str ( "menu_color" ), &g_options.menu_color1, Color ( 255, 25, 255, 255 ) );
+    set ( xor_str ( "menu_color_selected" ), &g_options.menu_color_selected, Color ( 255, 25, 255, 255 ) );
 }
 
 void c_config::set ( const std::string& name, bool* b, const bool start_val, const bool save )

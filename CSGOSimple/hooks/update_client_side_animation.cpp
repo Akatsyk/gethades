@@ -30,8 +30,6 @@ void __fastcall hooks::hk_update_client_side_animation(void* ecx)
 
         const auto state = e->get_base_player_anim_state();
 
-        //e->set_abs_original ( e->vec_origin( ) );
-
         g_listener_entity.m_track[index].vmt.get_original< hooks::update_client_side_animation_t >(index::update_client_side_animation) (ecx);
 
         simtimes[e->ent_index()] = e->simulation_time();
@@ -45,6 +43,4 @@ void __fastcall hooks::hk_update_client_side_animation(void* ecx)
     }
     else
         g_listener_entity.m_track[index].vmt.get_original< hooks::update_client_side_animation_t >(index::update_client_side_animation) (ecx);
-
-    //simtimes[index] = e->simulation_time();
 }

@@ -13,6 +13,7 @@ class c_material_helper
 public:
     c_material_helper ( );
     ~c_material_helper ( );
+    void material_create();
     void init ( );
     void overwrite ( bool xqz, bool flat, bool wireframe, bool metallic, Color color ) const;
 private:

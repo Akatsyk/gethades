@@ -92,28 +92,27 @@ namespace interfaces
 		global_vars = **(c_global_vars_base***)((*(uintptr_t**)chl_client)[0] + 0x1F);
 
 		input = *reinterpret_cast<c_input**> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("B9 ? ? ? ? F3 0F 11 04 24 FF 50 10")) + 1);
+			xor_str("B9 ? ? ? ? F3 0F 11 04 24 FF 50 10")) + 0x1);
 
-		move_helper = ** reinterpret_cast<IMoveHelper***> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01")) + 2);
+		move_helper = **reinterpret_cast<IMoveHelper***> (g_utils.pattern_scan(xor_str("client.dll"),
+			xor_str("8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01")) + 0x2);
 
 		glow_obj_manager = *reinterpret_cast<CGlowObjectManager**> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("0F 11 05 ? ? ? ? 83 C8 01")) + 3);
+			xor_str("0F 11 05 ? ? ? ? 83 C8 01")) + 0x3);
 
 		view_render = *reinterpret_cast<IViewRender**> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("A1 ? ? ? ? B9 ? ? ? ? C7 05 ? ? ? ? ? ? ? ? FF 10")) + 1);
+			xor_str("A1 ? ? ? ? B9 ? ? ? ? C7 05 ? ? ? ? ? ? ? ? FF 10")) + 0x1);
 
-		d3d_device9 = ** reinterpret_cast<IDirect3DDevice9***> (g_utils.pattern_scan(xor_str("shaderapidx9.dll"),
-			xor_str("A1 ? ? ? ? 50 8B 08 FF 51 0C")) + 1);
+		d3d_device9 = **reinterpret_cast<IDirect3DDevice9***> (g_utils.pattern_scan(xor_str("shaderapidx9.dll"),
+			xor_str("A1 ? ? ? ? 50 8B 08 FF 51 0C")) + 0x1);
 
-		client_state = ** reinterpret_cast<CClientState***> (g_utils.pattern_scan(xor_str("engine.dll"), 
-			xor_str("A1 ? ? ? ? 33 D2 6A 00 6A 00 33 C9 89 B0")) + 1);
+		client_state = **(CClientState***)((*(uintptr_t**)engine_client)[12] + 0x10);
 
 		render_beams = *reinterpret_cast<IViewRenderBeams**> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")) + 1);
+			xor_str("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")) + 0x1);
 
 		g_local = *reinterpret_cast<C_LocalPlayer*> (g_utils.pattern_scan(xor_str("client.dll"),
-			xor_str("8B 0D ? ? ? ? 83 FF FF 74 07")) + 2);
+			xor_str("8B 0D ? ? ? ? 83 FF FF 74 07")) + 0x2);
 	}
 
 	void dump()

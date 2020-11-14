@@ -114,7 +114,10 @@ void c_material_helper::init()
   "$wireframe" "0"
 }
 )#");
+}
 
+void c_material_helper::material_create()
+{
     material_regular = interfaces::mat_system->find_material(xor_str("material_regular"), TEXTURE_GROUP_MODEL);
     material_reflective = interfaces::mat_system->find_material(xor_str("material_reflective"), TEXTURE_GROUP_MODEL);
     material_flat = interfaces::mat_system->find_material(xor_str("material_flat"), TEXTURE_GROUP_MODEL);

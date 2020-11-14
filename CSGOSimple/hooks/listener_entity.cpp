@@ -22,18 +22,13 @@ void c_listener_entity::on_entity_created(C_BaseEntity* ent)
 
 	if (cc->class_id == CCSPlayer)
 	{
-#ifdef _DEBUG
-		console::write_line("on_entity_created player");
-#endif // _DEBUG
 		hook_entity(ent);
+
 		g_utils.on_player_create(reinterpret_cast<C_BasePlayer*> (ent));
 	}
 	else if (ent->is_weapon())
 	{
-#ifdef _DEBUG
-		console::write_line("on_entity_created weapon");
-#endif // _DEBUG
-		hook_weapon(ent);
+		//hook_weapon(ent);
 	}
 }
 
@@ -54,10 +49,6 @@ void c_listener_entity::on_entity_deleted(C_BaseEntity* ent)
 
 	if (it == m_track.end())
 		return;
-
-#ifdef _DEBUG
-	console::write_line("on_entity_deleted player");
-#endif // _DEBUG
 
 	if (m_track[it->m_index].m_hooked)
 		m_track[it->m_index].vmt.unhook_all();
@@ -82,9 +73,6 @@ bool c_listener_entity::init()
 			if (!entity)
 				continue;
 
-#ifdef _DEBUG
-			console::write_line("init hook player");
-#endif // _DEBUG
 			hook_entity(entity);
 		}
 	}
@@ -118,9 +106,9 @@ void c_listener_entity::hook_entity(C_BaseEntity* ent)
 
 void c_listener_entity::hook_weapon(C_BaseEntity* ent)
 {
-	//auto i = ent->ent_index ( );
-	//m_track[ i ].m_index = i;
-	//m_track[ i ].vmt.setup ( ent );
-	//m_track[ i ].vmt.hook_index ( index::update_client_side_animation, hooks::hk_update_client_side_animation );
-	//m_track[ i ].m_hooked = true;
+	auto i = ent->ent_index ( );
+	m_track[ i ].m_index = i;
+	m_track[ i ].vmt.setup ( ent );
+	m_track[ i ].vmt.hook_index ( index::update_client_side_animation, hooks::hk_update_client_side_animation );
+	m_track[ i ].m_hooked = true;
 }

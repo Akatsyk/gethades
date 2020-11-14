@@ -29,13 +29,13 @@ namespace index
 	constexpr auto setup_bones = 13;
 	constexpr auto do_extra_bones_processing = 197;
 	constexpr auto update_client_side_animation = 223;
-	constexpr auto is_hltv = 93;
+	constexpr auto is_hltv = 94;
 	constexpr auto in_prediction = 14;
 	constexpr auto get_abs_origin = 1;
 	constexpr auto calc_view = 276;
-	constexpr auto accumulate_layers = 206;
-	constexpr auto get_eye_angles = 169;
-	constexpr auto post_data_update = 7;
+	constexpr auto accumulate_layers = 208;
+	constexpr auto get_eye_angles = 285;
+	constexpr auto post_data_update = 9;
 }
 
 class c_event_handler
